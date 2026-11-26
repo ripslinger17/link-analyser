@@ -1,0 +1,9 @@
+.env
+*.env
+.link_analyser/
+__pycache__/
+*.py[cod]
+app/data/
+.DS_Store
+.pytest_cache/
+!.env.example

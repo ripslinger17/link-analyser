@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <title>Link Analyser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="google-sans">
+    <header class="brand" aria-label="Link Analyser">
+      <span class="brand-mark"><i data-lucide="link-2" aria-hidden="true"></i></span>
+      <span>Link Analyser</span>
+    </header>
+
+    <main id="stage" class="stage">
+      <div id="welcome" class="welcome">
+        <h1 id="tagline" class="tagline">One link is all we need.</h1>
+      </div>
+
+      <section id="thread" class="thread" aria-label="Analysis conversation"></section>
+
+      <form id="search-form" class="search-shell" autocomplete="off">
+        <div id="addon-wrap" class="addon-wrap">
+          <button
+            type="button"
+            id="add-button"
+            class="add-button"
+            aria-label="Choose Gemini model"
+            aria-expanded="false"
+            aria-controls="model-menu"
+            title="Choose Gemini model"
+          >
+            <i data-lucide="cpu" aria-hidden="true"></i>
+          </button>
+          <div id="model-menu" class="dropdown" role="menu" aria-label="Gemini model">
+            <p class="dropdown-label">Gemini model</p>
+            <button
+              type="button"
+              class="model-option is-selected"
+              role="menuitemradio"
+              aria-checked="true"
+              data-model="gemini-3.5-flash-lite"
+            >
+              <span>Gemini 3.5 Flash Lite</span>
+            </button>
+            <button
+              type="button"
+              class="model-option"
+              role="menuitemradio"
+              aria-checked="false"
+              data-model="gemini-3.6-flash"
+            >
+              <span>Gemini 3.6 Flash</span>
+            </button>
+            <button
+              type="button"
+              class="model-option"
+              role="menuitemradio"
+              aria-checked="false"
+              data-model="gemini-3.8-flash"
+            >
+              <span>Gemini 3.8 Flash</span>
+            </button>
+          </div>
+        </div>
+
+        <input
+          id="link-input"
+          class="search-input"
+          type="text"
+          inputmode="url"
+          placeholder="Paste a URL to analyse"
+          aria-label="Website link"
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="url"
+        />
+
+        <button type="submit" id="send-button" class="send-button" aria-label="Analyse link">
+          <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+        </button>
+      </form>
+      <p id="screen-reader-status" class="sr-only" role="status" aria-live="polite"></p>
+    </main>
+
+    <template id="analysis-template">
+      <article class="analysis-entry">
+        <div class="request-row">
+          <a class="request-bubble" target="_blank" rel="noopener noreferrer">
+            <i data-lucide="link-2" aria-hidden="true"></i>
+            <span class="request-link"></span>
+            <i data-lucide="arrow-up-right" class="request-external" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <div class="analysis-response">
+          <div class="site-identity">
+            <span class="site-logo" aria-hidden="true">
+              <img class="site-favicon" alt="" hidden />
+              <span class="site-fallback">W</span>
+            </span>
+            <div class="site-headings">
+              <h2 class="site-name"></h2>
+              <p class="site-domain"></p>
+            </div>
+            <span class="analysis-state">Analysing</span>
+          </div>
+
+          <ol class="timeline" aria-label="Analysis progress">
+            <li class="timeline-step is-pending">
+              <span class="step-marker" aria-hidden="true"></span>
+              <div class="step-copy">
+                <p class="step-title">Validating URL</p>
+                <p class="step-description">Checking the link format</p>
+              </div>
+            </li>
+            <li class="timeline-step is-pending">
+              <span class="step-marker" aria-hidden="true"></span>
+              <div class="step-copy">
+                <p class="step-title">Scraping homepage</p>
+                <p class="step-description">Fetching and cleaning the page</p>
+              </div>
+            </li>
+            <li class="timeline-step is-pending">
+              <span class="step-marker" aria-hidden="true"></span>
+              <div class="step-copy">
+                <p class="step-title">Finding competitors</p>
+                <p class="step-description">Generating queries and searching</p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="report-sections" aria-label="Analysis sections"></div>
+
+          <div class="final-result" hidden>
+            <div class="result-heading">
+              <span class="result-symbol"><i data-lucide="check" aria-hidden="true"></i></span>
+              <strong class="result-title">Analysis complete</strong>
+              <span class="result-code" hidden></span>
+            </div>
+            <p class="result-message"></p>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
