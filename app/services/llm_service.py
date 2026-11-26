@@ -2,6 +2,7 @@
 
 import json
 import re
+from functools import wraps
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -92,6 +93,24 @@ SEO_GROUPS = {
 
 class LLMOutputValidationError(ValueError):
     """Raised when Gemini does not honour one of the structured-output contracts."""
+
+
+def retry_invalid_structured_output(function):
+    """Retry one malformed Gemini response with the same Gemini model and prompt."""
+
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except LLMOutputValidationError as first_error:
+            try:
+                return function(*args, **kwargs)
+            except LLMOutputValidationError as second_error:
+                raise LLMOutputValidationError(
+                    "Gemini returned invalid structured output after one retry."
+                ) from second_error
+
+    return wrapped
 
 QUERY_PROMPT_TEMPLATE = """You are an SEO competitor research assistant.
 Based only on the website content below, write exactly {count} Google search queries
@@ -234,6 +253,7 @@ WEBSITE CONTENT:
 """
 
 
+@retry_invalid_structured_output
 def generate_search_queries(
     clean_html_path: str | Path,
     count: int = 3,
@@ -249,11 +269,14 @@ def generate_search_queries(
     queries = parse_queries(response_text, count)
 
     if len(queries) < count:
-        raise RuntimeError(f"Gemini returned only {len(queries)} of {count} search queries.")
+        raise LLMOutputValidationError(
+            f"Gemini returned only {len(queries)} of {count} search queries."
+        )
 
     return queries[:count]
 
 
+@retry_invalid_structured_output
 def generate_comparison_table(
     sites: list[dict],
     column_count: int = 4,
@@ -328,6 +351,7 @@ def generate_comparison_table(
     return {"rowHeader": True, "columns": columns, "rows": rows}
 
 
+@retry_invalid_structured_output
 def generate_search_query_table(
     clean_html_path: str | Path,
     count: int = 5,
@@ -369,6 +393,7 @@ def generate_search_query_table(
     }
 
 
+@retry_invalid_structured_output
 def generate_seo_suggestions(clean_html_path: str | Path, model: str | None = None) -> dict:
     """Build section 3: grouped SEO suggestions as bullet-friendly data."""
     html = Path(clean_html_path).read_text(encoding="utf-8", errors="replace")
@@ -438,6 +463,7 @@ def generate_seo_suggestions(clean_html_path: str | Path, model: str | None = No
     return {"groups": groups}
 
 
+@retry_invalid_structured_output
 def generate_services_table(
     clean_html_path: str | Path,
     count: int = 5,
@@ -477,6 +503,7 @@ def generate_services_table(
     }
 
 
+@retry_invalid_structured_output
 def generate_audience_profile(
     clean_html_path: str | Path,
     model: str | None = None,

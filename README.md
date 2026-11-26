@@ -246,38 +246,42 @@ Prices checked on **26 November 2026** from the official pricing pages. All valu
 Sources:
 
 - [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing)
-- [Gemini 3.5 Flash-Lite model page](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite)
 - [OpenAI pricing](https://platform.openai.com/docs/pricing)
 - [Anthropic pricing](https://platform.claude.com/docs/en/about-claude/pricing)
+- [Artifical Analysis](https://artificialanalysis.ai/leaderboards/models)
 
 ### Final recommendation
 
-Use **`gemini-3.5-flash-lite`** as the default. It is already wired into the app, has a free tier for evaluation, is optimised for high-volume structured extraction, and its paid rates are low enough for this six-call pipeline. Keep `gemini-3.6-flash` / `gemini-3.8-flash` selectable in the UI when deeper reasoning is needed. OpenAI and Anthropic are viable paid alternatives but would require provider adapters and live quality tests before switching.
+**I would recommend *`GPT-6-Luna`* because it is the cheapest with decent enough intellinege with maximum thinking.**
+
+Because no free API was available *Gemini Models* are being used here.
 
 ### Cost estimate per analysis
 
-The default pipeline makes six Gemini calls. This build caps cleaned page text at 20,000 characters per site, so the default three-competitor report is roughly **45k input + 6k output tokens**. Requesting more competitors increases the comparison-table input and output proportionally.
+The default pipeline makes six AI calls. This build caps cleaned page text at 20,000 characters per site, so the default report is roughly **45k input + 6k output tokens**. Requesting more competitors increases the comparison-table input and output proportionally. 
 
-| Model | Estimated LLM cost per analysis |
-| --- | ---: |
-| Gemini 3.5 Flash Lite, free tier | $0.00 (subject to free-tier limits) |
-| Gemini 3.5 Flash Lite, paid | ~$0.03 |
-| Gemini 3.8 Flash, paid | ~$0.06 |
-| GPT-6 Luna / Claude Haiku 5.5, paid | ~$0.01 before adapter work and tokenizer differences |
+If using `GPT-6-Luna` then total Input cost will be 45,000 x 3 = 1,35,000 tokens = $0.00675 and Output cost will be 6,000 x 3 = 18,000 tokens = $0.00450.
+
+|| Provider | Model | API cost: input / output | Response speed | Accuracy / quality signal | Context window | JSON support | Fit for website content understanding |
+|---|---|---:|---|---|---|---|---|
+| Google | Gemini 3.5 Flash-Lite | **$0.30 / $2.50** | No comparable measured latency available | Not scored on the cited leaderboard | Not confirmed in the linked pricing section | Structured output available; test your schema | Low cost for routine extraction and simple pages |
+| Google | Gemini 3.6 Flash | **$0.75 / $3.75** through Dec. 31, 2026; **$1.50 / $7.50** from Jan. 1, 2027 | No comparable measured latency available | Not scored on the cited leaderboard | Not confirmed in the linked pricing section | Structured output available; test your schema | Everyday page parsing; Google labels it a previous-generation Flash model |
+| Google | Gemini 3.8 Flash | **$0.75 / $3.75** through Dec. 31, 2026; **$1.50 / $7.50** from Jan. 1, 2027 | No comparable measured latency available | Not scored on the cited leaderboard | Not confirmed in the linked pricing section | Structured output available; test your schema | Strong Google candidate for more complex pages; Google calls it its most intelligent Flash model |
+| OpenAI | GPT-6.1 Terra | **$0.50 / $2.50** | Artificial Analysis: **15.0 min per task** for Max; low effort is among the quickest models on its task-time measure | Intelligence Index **51** for Max | **1M** reported on the leaderboard | Structured Outputs supported | Good mid-cost choice for complex pages, reasoning, and visual content |
+| OpenAI | GPT-6 Luna | **$0.05 / $0.25** | Artificial Analysis: **10.2 min per task** for Max; low effort is fastest by task time in its comparison | Intelligence Index **28** for Max | **1M** reported on the leaderboard | Structured Outputs supported | Cheapest option; best for straightforward extraction and high-volume work |
+| Anthropic | Claude Haiku 5.5 | **$0.10 / $0.50** for prompts up to 100k tokens; **$0.50 / $2.50** above 100k | Anthropic rates it “Fastest”; Artificial Analysis: **14.7 min per task** for Max | Intelligence Index **37** for Max | **1M** | Structured outputs supported; check API/schema constraints | Strong choice for high-volume extraction and classification |
+| Anthropic | Claude Sonnet 5.5 | **$2 / $10** | Anthropic rates it “Fast”; Artificial Analysis: **31.1 min per task** for Max | Intelligence Index **55** for Max | **1M** | Structured outputs supported; check API/schema constraints | Best fit in this set for nuanced or difficult content, at higher cost |
 
 Serper search costs are plan-dependent and are **not** included.
-
-> **Measured vs estimated:** token counts and costs above are estimates, not measured billing data. One live Gemini + Serper run was completed for `https://www.python.org` (see logs above), but provider comparison, latency distribution, and exact token billing were not benchmarked across models. Most regression tests use mocks. Treat the cost table as a planning estimate until you inspect the provider usage dashboards. Pricing can change; re-check the linked provider pages before submission.
 
 ## 7. Submission details
 
 | Item | Status |
 | --- | --- |
-| Public GitHub repository | TODO — create repo and push |
-| Live demo URL | TODO — deploy FastAPI service publicly |
-| Swagger docs | `<live-demo-url>/docs` |
-| Contact email | TODO — add evaluator email |
-| Social verification links | TODO — add GitHub/X/LinkedIn links |
+| Public GitHub repository | https://github.com/ripslinger17/link-analyser |
+| Live demo URL | https://link-analyser-vro8.onrender.com/ |
+| Swagger docs | https://link-analyser-vro8.onrender.com/docs |
+| Contact email | smit.p1707@gmail.com |
+| GitHub | https://github.com/ripslinger17 |
+| Linkedin | https://www.linkedin.com/in/smit-patel17/ |
 | API keys in repo | No. `.env` is ignored; only `.env.example` is committed. |
-
-Generated HTML, favicons and virtualenv files are ignored via `.gitignore`. Remove any local `app/data/*` artifacts before publishing if you do not want sample scraped pages in the repo.

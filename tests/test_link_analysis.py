@@ -25,6 +25,7 @@ from app.services.llm_service import (
     generate_audience_profile,
     generate_comparison_table,
     generate_seo_suggestions,
+    generate_services_table,
     parse_value_rows,
 )
 from app.utils.validators import BlockedURLError, Validator, request_public_url
@@ -336,6 +337,34 @@ class ModelSelectionTests(unittest.TestCase):
 
 
 class LLMStructuredOutputValidationTests(unittest.TestCase):
+    def test_retries_once_with_gemini_when_structured_output_is_invalid(self):
+        with tempfile.TemporaryDirectory() as directory:
+            page = Path(directory) / "clean.html"
+            page.write_text("<h1>Example</h1>", encoding="utf-8")
+            valid = {
+                "rows": [
+                    {
+                        "values": [
+                            f"Service {index}",
+                            "Description",
+                            "Industry",
+                            "Customer",
+                            "Benefit",
+                            "website",
+                        ]
+                    }
+                    for index in range(1, 6)
+                ]
+            }
+            with patch(
+                "app.services.llm_service.ask_gemini",
+                side_effect=['{"rows": []}', json.dumps(valid)],
+            ) as ask:
+                services = generate_services_table(page)
+
+        self.assertEqual(ask.call_count, 2)
+        self.assertEqual(len(services["rows"]), 5)
+
     def test_rejects_incomplete_comparison_and_value_rows(self):
         with tempfile.TemporaryDirectory() as directory:
             page = Path(directory) / "clean.html"
