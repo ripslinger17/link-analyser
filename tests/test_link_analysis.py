@@ -365,6 +365,23 @@ class LLMStructuredOutputValidationTests(unittest.TestCase):
         self.assertEqual(ask.call_count, 2)
         self.assertEqual(len(services["rows"]), 5)
 
+    def test_accepts_valid_array_rows_from_gemini(self):
+        rows = parse_value_rows(
+            json.dumps(
+                {
+                    "rows": [
+                        ["query", "Google", "Commercial", "high", "buyers"]
+                        for _ in range(5)
+                    ]
+                }
+            ),
+            count=5,
+            column_count=5,
+        )
+
+        self.assertEqual(len(rows), 5)
+        self.assertEqual(rows[0][0], "query")
+
     def test_rejects_incomplete_comparison_and_value_rows(self):
         with tempfile.TemporaryDirectory() as directory:
             page = Path(directory) / "clean.html"

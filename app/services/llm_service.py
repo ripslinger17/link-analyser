@@ -1,6 +1,7 @@
 """Gemini helpers for query generation and structured comparison reports."""
 
 import json
+import logging
 import re
 from functools import wraps
 from pathlib import Path
@@ -10,6 +11,8 @@ import requests
 from bs4 import BeautifulSoup
 
 from app.config import get_env
+
+logger = logging.getLogger(__name__)
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 API_REVISION = "2026-05-20"
@@ -103,11 +106,22 @@ def retry_invalid_structured_output(function):
         try:
             return function(*args, **kwargs)
         except LLMOutputValidationError as first_error:
+            logger.warning(
+                "Gemini structured output failed validation in %s; retrying once: %s",
+                function.__name__,
+                first_error,
+            )
             try:
                 return function(*args, **kwargs)
             except LLMOutputValidationError as second_error:
+                logger.error(
+                    "Gemini structured output failed validation again in %s: %s",
+                    function.__name__,
+                    second_error,
+                )
                 raise LLMOutputValidationError(
-                    "Gemini returned invalid structured output after one retry."
+                    "Gemini returned invalid structured output after one retry in "
+                    f"{function.__name__}: {second_error}"
                 ) from second_error
 
     return wrapped
@@ -724,9 +738,14 @@ def parse_value_rows(text: str, count: int, column_count: int) -> list[list[str]
 
     rows = []
     for item in items:
-        if not isinstance(item, dict):
+        if isinstance(item, dict):
+            values = item.get("values")
+        elif isinstance(item, list):
+            # Gemini sometimes returns the documented row values directly
+            # instead of wrapping them in a {"values": [...]} object.
+            values = item
+        else:
             raise LLMOutputValidationError("The model response contains an invalid row.")
-        values = item.get("values")
         if not isinstance(values, list) or len(values) != column_count:
             raise LLMOutputValidationError("A model row has the wrong number of values.")
 

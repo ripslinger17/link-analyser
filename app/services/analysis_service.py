@@ -1,6 +1,7 @@
 """The single streaming endpoint that runs the full link-analysis pipeline."""
 
 import json
+import logging
 import re
 from collections.abc import Iterator
 from urllib.parse import urlparse
@@ -27,6 +28,7 @@ from app.services.website_extractor import extract_homepage, validate_link
 from app.utils.validators import ValidationResult, Validator
 
 router = APIRouter(tags=["link-analysis"])
+logger = logging.getLogger(__name__)
 
 SECTION_ONE_TITLE = "Competitive overview"
 SECTION_TWO_TITLE = "Search opportunity map"
@@ -190,7 +192,8 @@ def run_pipeline(
                 audience_suggestions,
             ),
         )
-    except LLMOutputValidationError:
+    except LLMOutputValidationError as exc:
+        logger.error("Link analysis stopped after Gemini validation failure: %s", exc)
         yield sse(
             "error",
             {
