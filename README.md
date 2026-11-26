@@ -1,5 +1,8 @@
 # Link Analyser
 
+Youtube Video: https://youtu.be/Uu7KspE7ZRQ
+Live Demo: https://link-analyser-vro8.onrender.com (Might take upto 2 minutes to load)
+
 FastAPI service + browser UI that validates a website, cleans its homepage, researches competitors with Serper, and returns one structured SEO/business report generated with Gemini.
 
 - UI: `http://localhost:4000/`
